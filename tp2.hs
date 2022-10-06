@@ -1,3 +1,10 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Redundant where" #-}
+import Data.Char
+import Data.Type.Coercion (trans)
+import Language.Haskell.TH (lam1E)
+
 and' :: [Bool] -> Bool
 and' xs = foldr (&&) True xs
 
@@ -21,7 +28,7 @@ elem' v (x : xs) = v == x || elem v xs
 
 interperse' :: a -> [a] -> [a]
 interperse' _ [] = []
-interperse' _ [x] = [x] 
+interperse' _ [x] = [x]
 interperse' a (x : xs) = x : a : interperse' a xs
 
 mdc' :: Integer -> Integer -> Integer
@@ -83,4 +90,74 @@ binom :: Integer -> Integer -> Integer
 binom n k = div (product [1 .. n]) (product [1 .. k] * product [1 .. n - k])
 
 pascal :: Integer -> [[Integer]]
-pascal n = [[binom x k | k <- [0 .. x]] | x <- [0..n]]
+pascal n = [[binom x k | k <- [0 .. x]] | x <- [0 .. n]]
+
+cifraLetra :: Int -> Char -> Char
+cifraLetra n l
+  | isUpper l = chr (mod (ord l + n - ord 'A') 26 + ord 'A')
+  | isLower l = chr (mod (ord l + n - ord 'a') 26 + ord 'a')
+  | otherwise = l
+
+cifrar :: Int -> String -> String
+cifrar n p = [cifraLetra n x | x <- p]
+
+concat'' :: [[a]] -> [a]
+concat'' l = [x | xs <- l, x <- xs]
+
+replicate'' :: Int -> a -> [a]
+replicate'' n a = [a | _ <- [1 .. n]]
+
+forte :: String -> Bool
+forte password = length password >= 8 && or [isUpper x | x <- password] && or [isLower x | x <- password] && or [isNumber x | x <- password]
+
+mindiv :: Int -> Int
+mindiv n
+  | null z = n
+  | otherwise = head z
+  where
+    z = [x | x <- [2 .. floor (sqrt (fromIntegral n))], mod n x == 0]
+
+primo' :: Int -> Bool
+primo' n = mindiv n == 1
+
+nub' :: Eq a => [a] -> [a]
+nub' [] = []
+nub' (x : xs) = x : nub' [y | y <- xs, y /= x]
+
+transpose' :: [[a]] -> [[a]]
+transpose' l = [[x !! n | x <- l] | n <- [0 .. (z -1)]]
+  where
+    z = length (head l)
+
+algarismos :: Int -> [Int]
+algarismos n
+  | n < 9 = [n]
+  | otherwise = algarismos (div n 10) ++ [mod n 10]
+
+toBits :: Int -> [Int]
+toBits n
+  | n <= 1 = [n]
+  | otherwise = toBits (div n 2) ++ [mod n 2]
+
+fromBits :: [Int] -> Int
+fromBits l = sum [(2 ^ j) * i | (i, j) <- zip l (reverse [0 .. length l - 1])]
+
+merge :: Ord a => [a] -> [a] -> [a]
+merge [] [] = []
+merge [] l2 = l2
+merge l1 [] = l1
+merge (x1 : l1) (x2 : l2)
+  | x1 < x2 = x1 : merge l1 (x2 : l2)
+  | otherwise = x2 : merge (x1 : l1) l2
+
+metades :: [a] -> ([a], [a])
+metades l = splitAt s l
+  where
+    s = div (length l) 2
+
+msort :: Ord a => [a] -> [a]
+msort [] = []
+msort [n] = [n]
+msort l = merge (msort x1) (msort x2)
+  where
+    (x1, x2) = metades l
