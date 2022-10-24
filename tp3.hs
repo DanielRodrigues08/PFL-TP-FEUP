@@ -36,10 +36,10 @@ concat' :: [[a]] -> [a]
 concat' l1 = foldr (++) [] l1
 
 reverse' :: [a] -> [a]
-reverse' l1 = foldr (\x xs -> xs ++ [x]) [] l1
+reverse' l1 = foldr (\x acc -> acc ++ [x]) [] l1
 
 reverse'' :: [a] -> [a]
-reverse'' l1 = foldl (\xs x -> x : xs) [] l1
+reverse'' l1 = foldl (\acc x -> x : acc) [] l1
 
 elem' :: Eq a => a -> [a] -> Bool
 elem' x l = any (\y -> x == y) l
@@ -47,3 +47,15 @@ elem' x l = any (\y -> x == y) l
 scanl' :: (b -> a -> b) -> b -> [a] -> [b]
 scanl' _ i [] = [i]
 scanl' f i (x : xs) = i : scanl' f (f i x) xs
+
+palavras :: String -> [String]
+palavras "" = []
+palavras s = a : (palavras . (dropWhile (== ' ') . drop (length a))) s
+  where
+    a = takeWhile (/= ' ') s
+
+despalavras :: [String] -> String
+despalavras l
+  | null l = ""
+  | length l == 1 = l !! 0
+  | otherwise = head l ++ " " ++ despalavras (tail l)
